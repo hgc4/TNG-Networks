@@ -168,7 +168,7 @@ def Infall(subIDs, snapnum=99, simulation=100, order=1, Dark=False, save=None):
 		InfallParams = np.asarray([Sim, aInfall, aMax, Mu, Vel, MH, mH, subIDs, haloIDs, centIDs])
 	else:
 		InfallParams = np.asarray([Sim, aInfall, aMax, Mu, Vel, MH, mH, MS, mS, MG, mG, subIDs, haloIDs, centIDs])
-    if save is not None:
+	if save is not None:
 		if Dark:
 			np.save('{}-Dark.npy'.format(save), InfallParams)
 		else:
