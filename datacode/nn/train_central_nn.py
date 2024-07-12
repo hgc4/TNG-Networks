@@ -7,14 +7,14 @@ time = d1['time'][:]
 age = d1['lookback_time'][:]
 
 d1xt = np.stack((d1['Mhdot'][:], d1['delta1'][:], d1['delta3'][:], d1['delta5'][:], d1['vcirc'][:], d1['rhalf'][:], d1['skew'][:], d1['minD'][:]), axis=-1)
-d1xs = np.stack((d1['beta'][:], d1['d_minima'][:], d1['d_node'][:], d1['d_saddle_1'][:], d1['d_saddle_2'][:], d1['d_skel'][:], d1['formtime'][:], d1['logMh'][:], d1['logmaxMhdot'][:]), axis=-1)
+d1xs = np.stack((d1['beta'][:], d1['d_min'][:], d1['d_node'][:], d1['d_saddle_1'][:], d1['d_saddle_2'][:], d1['d_skel'][:], d1['formtime'][:], d1['logMh'][:], d1['logmaxMhdot'][:]), axis=-1)
 d1y = np.concatenate((d1['SFH'][:], d1['ZH'][:], d1['logZ'][:].reshape(len(d1xs), 1), d1['logMs'][:].reshape(len(d1xs), 1), d1['mwsa'][:].reshape(len(d1xs), 1)), axis=-1)
 
 d2xt = np.stack((d2['Mhdot'][:], d2['delta1'][:], d2['delta3'][:], d2['delta5'][:], d2['vcirc'][:], d2['rhalf'][:], d2['skew'][:], d2['minD'][:]), axis=-1)
-d2xs = np.stack((d2['beta'][:], d2['d_minima'][:], d2['d_node'][:], d2['d_saddle_1'][:], d2['d_saddle_2'][:], d2['d_skel'][:], d2['formtime'][:], d2['logMh'][:], d2['logmaxMhdot'][:]), axis=-1)
+d2xs = np.stack((d2['beta'][:], d2['d_min'][:], d2['d_node'][:], d2['d_saddle_1'][:], d2['d_saddle_2'][:], d2['d_skel'][:], d2['formtime'][:], d2['logMh'][:], d2['logmaxMhdot'][:]), axis=-1)
 d2y = np.concatenate((d2['SFH'][:], d2['ZH'][:], d2['logZ'][:].reshape(len(d2xs), 1), d2['logMs'][:].reshape(len(d2xs), 1), d2['mwsa'][:].reshape(len(d2xs), 1)), axis=-1)
 
-d1xt1q, d1xt1g = GQTvecnorm(d1xt[:,:,0])
+d1xt1q, d1xt1g = GQTvecnorm(d1xt[:,:,0].reshape(len(d1xt), 33, 1))
 d1xt2q, d1xt2g = GQTscalnorm(d1xt[:,:,1:4])
 d1xt3q, d1xt3g = GQTvecnorm(d1xt[:,:,4:])
 d1xtq = np.stack((d1xt1q, d1xt2q, d1xt3q), axis=-1)
@@ -25,7 +25,7 @@ d1y2q, d1y2g = GQTvecnorm(d1y[:,33:66].reshape(len(d1xs), 33, 1))
 d1y3q, d1y3g = GQTscalnorm(d1y[:,66:])
 d1yq = np.stack((d1y1q, d1y2q, d1y3q), axis=-1)
 
-d2xt1q, d2xt1g = GQTvecnorm(d2xt[:,:,0])
+d2xt1q, d2xt1g = GQTvecnorm(d2xt[:,:,0].reshape(len(d2xt), 33, 1))
 d2xt2q, d2xt2g = GQTscalnorm(d2xt[:,:,1:4])
 d2xt3q, d2xt3g = GQTvecnorm(d2xt[:,:,4:])
 d2xtq = np.stack((d2xt1q, d2xt2q, d2xt3q), axis=-1)
