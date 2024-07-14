@@ -660,7 +660,7 @@ def sfhint(sfh, time, log=False):
 		else:
 			return ms
 	else:
-		raise Exception: "SFH must be a 1D or 2D array, of shape (n_samples, n_timesteps)."
+		raise Exception("SFH must be a 1D or 2D array, of shape (n_samples, n_timesteps).")
 
 def mwz(zh, sfh, time, log=False):
 	'''
@@ -688,7 +688,7 @@ def mwz(zh, sfh, time, log=False):
 		else:
 			return np.asarray(MWZ)
 	else:
-		raise Exception: "SFH and ZH must be 1D or 2D arrays, of equal shape (n_samples, n_timesteps)."
+		raise Exception("SFH and ZH must be 1D or 2D arrays, of equal shape (n_samples, n_timesteps).")
 
 def mwa(lookback, sfh):
 	'''
@@ -705,7 +705,7 @@ def mwa(lookback, sfh):
 		assert np.shape(lookback) == np.shape(sfh), "SFH must be same length as lookback time domain."
 		return np.average(lookback, weights=sfh)
 	else:
-		raise Exception: "SFH must be a 1D or 2D array, of shape (n_samples, n_timesteps)."
+		raise Exception("SFH must be a 1D or 2D array, of shape (n_samples, n_timesteps).")
 
 def ABmag0(x, y, Band, D=10, ModelB=False, flambda=True, spline='linear', Nint=100000, xlog=False, ylog=False):
 	assert len(x) == len(y), "x and y must be equal in size."

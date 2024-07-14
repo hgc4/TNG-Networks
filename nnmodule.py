@@ -7,6 +7,15 @@ from sklearn.preprocessing import QuantileTransformer
 def ReLU(x, maxval=1):
 	return keras.backend.relu(x, max_value=maxval)
 
+def offsets(data):
+	Offsets = []
+	for o in range(np.shape(data)[-1]):
+		dat = data[...,o].ravel()
+		udat = np.unique(dat)
+		diff = np.diff(udat)
+		Offsets.append([abs(diff[1] - diff[0]), abs(diff[-1] - diff[-2])])
+	return np.asarray(Offsets)
+
 def GQTvecnorm(data):
 	'''
 	Gaussian Quantile Transformation of 3D (temporal) dataset, with vector normalisation.
@@ -16,8 +25,14 @@ def GQTvecnorm(data):
 	sample_ax, timestep_ax, quantity_ax = datashape
 	Data = data.reshape(sample_ax*timestep_ax, quantity_ax)
 	qData = GQT.fit_transform(Data)
+	Offsets = offsets(qData)
+	for o in range(len(Offsets)):
+		wmin = np.where(qData[...,o]==np.min(qData[...,o]))
+		wmax = np.where(qData[...,o]==np.max(qData[...,o]))
+		qData[wmin] += Offsets[o,0]
+		qData[wmax] -= Offsets[o,1]
 	qData = qData.reshape(*datashape)
-	return qData, GQT
+	return qData, GQT, Offsets
 
 def GQTscalnorm(data, add_dim=False):
 	'''
@@ -29,28 +44,50 @@ def GQTscalnorm(data, add_dim=False):
 		sample_ax, timestep_ax, quantity_ax = datashape
 		Data = data.reshape(sample_ax, quantity_ax*timestep_ax)
 		qData = GQT.fit_transform(Data)
+		Offsets = offsets(qData)
+		for o in range(len(Offsets)):
+			wmin = np.where(qData[...,o]==np.min(qData[...,o]))
+			wmax = np.where(qData[...,o]==np.max(qData[...,o]))
+			qData[wmin] += Offsets[o,0]
+			qData[wmax] -= Offsets[o,1]
 		qData = qData.reshape(*datashape)
 	else:
 		qData = GQT.fit_transform(data)
+		Offsets = offsets(qData)
+		for o in range(len(Offsets)):
+			wmin = np.where(qData[...,o]==np.min(qData[...,o]))
+			wmax = np.where(qData[...,o]==np.max(qData[...,o]))
+			qData[wmin] += Offsets[o,0]
+			qData[wmax] -= Offsets[o,1]
 		if add_dim:
 			qData = qData.reshape(*datashape, 1)
-	return qData, GQT
+	return qData, GQT, Offsets
 
-def GQTvecinv(qData, GQT):
+def GQTvecinv(qData, GQT, Offsets):
 	'''
 	Inverse Gaussian Quantile Transformation of 3D (temporal) dataset and GQT object, with vector normalisation.
 	'''
 	datashape = np.shape(qData)
 	sample_ax, timestep_ax, quantity_ax = datashape
 	qData = qData.reshape(sample_ax*timestep_ax, quantity_ax)
+	for o in range(len(Offsets)):
+		wmin = np.where(qData[...,o]==np.min(qData[...,o]))
+		wmax = np.where(qData[...,o]==np.max(qData[...,o]))
+		qData[wmin] -= Offsets[o,0]
+		qData[wmax] += Offsets[o,1]
 	data = GQT.inverse_transform(qData)
 	return data.reshape(*datashape)
 
-def GQTscalinv(qData, GQT, add_dim=False):
+def GQTscalinv(qData, GQT, Offsets, add_dim=False):
 	'''
 	Inverse Gaussian Quantile Transformation of 2D (non-temporal) or 3D (temporal) dataset and GQT object, with scalar normalisation.
 	'''
 	datashape = np.shape(qData)
+	for o in range(len(Offsets)):
+		wmin = np.where(qData[...,o]==np.min(qData[...,o]))
+		wmax = np.where(qData[...,o]==np.max(qData[...,o]))
+		qData[wmin] -= Offsets[o,0]
+		qData[wmax] += Offsets[o,1]
 	if len(datashape) > 2:
 		sample_ax, timestep_ax, quantity_ax = datashape
 		qData = qData.reshape(sample_ax, quantity_ax*timestep_ax)
@@ -165,7 +202,7 @@ def CentralNetwork():
 	dense = keras.layers.Dense(69)(dense)
 	model = keras.Model(inputs=inp, outputs=dense)
 	
-	optimizer = keras.optimizers.RMSprop(0.001)
+	optimizer = keras.optimizers.RMSprop(0.0007)
 	
 	model.compile(loss='mse', optimizer=optimizer, metrics=['mae'])
 	
