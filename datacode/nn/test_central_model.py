@@ -18,7 +18,7 @@ ZHq, ZHg = GQTvecnorm(ZH0.reshape(*np.shape(ZH0), 1))
 d3xt = np.stack((d3['Mhdot'][:], d3['delta1'][:], d3['delta3'][:], d3['delta5'][:], d3['vcirc'][:], d3['rhalf'][:], d3['skew'][:], d3['minD'][:]), axis=-1)
 d3xs = np.stack((d3['beta'][:], d3['d_min'][:], d3['d_node'][:], d3['d_saddle_1'][:], d3['d_saddle_2'][:], d3['d_skel'][:], d3['formtime'][:], d3['logMh'][:], d3['logmaxMhdot'][:]), axis=-1)
 
-d3xt1q, d3xt1g = GQTvecnorm(d3xt[:,:,0])
+d3xt1q, d3xt1g = GQTvecnorm(d3xt[:,:,0].reshape(np.shape(d3xt)[0:2], 1))
 d3xt2q, d3xt2g = GQTscalnorm(d3xt[:,:,1:4])
 d3xt3q, d3xt3g = GQTvecnorm(d3xt[:,:,4:])
 d3xtq = np.stack((d3xt1q, d3xt2q, d3xt3q), axis=-1)
